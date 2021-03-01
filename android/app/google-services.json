@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1046483268203",
+    "project_id": "free-books-59891",
+    "storage_bucket": "free-books-59891.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1046483268203:android:d6fb905e3af15113d8372e",
+        "android_client_info": {
+          "package_name": "com.taocoder.free_books"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1046483268203-bm7ai8a7m9u3ednot2fqk37e3cul4aii.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAFrwGD_L4I9RQo9XDpJw550PKv9F5JpXM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1046483268203-bm7ai8a7m9u3ednot2fqk37e3cul4aii.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
