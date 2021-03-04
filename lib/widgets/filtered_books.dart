@@ -18,36 +18,24 @@ class FilteredBooks extends StatelessWidget {
         }
         else if(state is FilteredBooksLoadSuccessState) {
           final books = state.books;
-          if(books.isEmpty != false) {
-            return StaggeredGridView.countBuilder(
-                itemCount: books.length,
-                crossAxisCount: 4,
-                itemBuilder: (BuildContext context, int index) {
-                  return Container(
-                      color: Colors.green,
-                      child: new Center(
-                        child: new CircleAvatar(
-                          backgroundColor: Colors.white,
-                          child: new Text('$index'),
-                        ),
-                      )
-                  );
-                },
-                staggeredTileBuilder: (int index) => new StaggeredTile.count(2, index.isEven ? 2 : 1),
-                mainAxisSpacing: 4.0,
-                crossAxisSpacing: 4.0,
-            );
-          }
-          else {
-            return Center(child: RaisedButton(child: Text('Upload Books',), onPressed: () {
-              if(BlocProvider.of<BooksBloc>(context).isLoggedIn) {
-                Navigator.pushNamed(context, 'addBook');
-              }
-              else {
-                Navigator.pushNamed(context, 'login');
-              }
-            },),);
-          }
+          return StaggeredGridView.countBuilder(
+            itemCount: books.length,
+            crossAxisCount: 4,
+            itemBuilder: (BuildContext context, int index) {
+              return Container(
+                  color: Colors.green,
+                  child: new Center(
+                    child: new CircleAvatar(
+                      backgroundColor: Colors.white,
+                      child: new Text('$index'),
+                    ),
+                  )
+              );
+            },
+            staggeredTileBuilder: (int index) => new StaggeredTile.count(2, index.isEven ? 2 : 1),
+            mainAxisSpacing: 4.0,
+            crossAxisSpacing: 4.0,
+          );
         }
         else {
           return Container();

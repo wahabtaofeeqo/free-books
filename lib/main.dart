@@ -15,7 +15,7 @@ void main() async {
     create: (context) {
       return BooksBloc(
         repository: BooksRepository()
-      )..add(BooksLoadSuccessEvent());
+      )..add(BooksLoadingEvent());
     },
     child: FreeBooksApp(),
   ));

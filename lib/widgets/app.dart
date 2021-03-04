@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:free_books/blocs/blocs.dart';
 import 'package:free_books/blocs/filtered_books/filtered_books.dart';
+import 'package:free_books/blocs/users/users.dart';
+import 'package:free_books/models/models.dart';
 import 'package:free_books/screens/home.dart';
 import 'package:free_books/screens/screens.dart';
 
@@ -28,6 +31,8 @@ class FreeBooksApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
 
+      builder: EasyLoading.init(),
+
       routes: {
         '/': (context) {
           return MultiBlocProvider(
@@ -42,10 +47,40 @@ class FreeBooksApp extends StatelessWidget {
         },
 
         'addBook': (context) {
-          return AddEditScreen(isEditing: false,);
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider<BooksBloc>(
+                create: (context) => BlocProvider.of<BooksBloc>(context),
+              )
+            ],
+
+            child: AddEditScreen(isEditing: false, onSave: (Book book) {},),
+          );
         },
 
-        'login': (context) => LoginScreen()
+        'login': (context) {
+              return MultiBlocProvider(
+                  providers: [
+                    BlocProvider<UsersBloc>(
+                      create: (context) => UsersBloc(),
+                    )
+                  ],
+
+                  child: LoginScreen(),
+              );
+        },
+
+        'register': (context) {
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider<UsersBloc>(
+                create: (context) => UsersBloc(),
+              )
+            ],
+
+            child: RegisterScreen(),
+          );
+        },
       },
     );
   }

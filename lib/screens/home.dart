@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:free_books/blocs/blocs.dart';
+import 'package:free_books/models/book.dart';
 import 'package:free_books/screens/screens.dart';
 import 'package:free_books/widgets/filtered_books.dart';
 
@@ -25,10 +26,10 @@ class HomeScreen extends StatelessWidget {
                   Navigator.of(context).push(MaterialPageRoute(
                       builder: (_) {
                         if(BlocProvider.of<BooksBloc>(context).isLoggedIn) {
-                          return AddEditScreen(isEditing: false,);
+                          return AddEditScreen(isEditing: false, onSave: (Book book) {},);
                         }
                         else {
-                          return LoginScreen();
+                          return WelcomeScreen();
                         }
                       }
                   ));

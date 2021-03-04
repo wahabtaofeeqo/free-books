@@ -8,7 +8,7 @@ class BooksRepository {
     return _firestore.collection("users").where('hasBook', isEqualTo: true).snapshots();
   }
 
-  Stream<QuerySnapshot> get books {
-    return _firestore.collection("books").snapshots();
+   Future<QuerySnapshot> get books async {
+     return await _firestore.collection("books").get();
   }
 }

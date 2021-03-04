@@ -8,6 +8,8 @@ abstract class BooksEvent extends Equatable {
   List<Object> get props => [];
 }
 
+class BooksLoadingEvent extends BooksEvent {}
+
 class BooksLoadSuccessEvent extends BooksEvent {}
 
 class BooksLoadFailEvent extends BooksEvent {}
