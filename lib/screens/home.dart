@@ -20,8 +20,16 @@ class HomeScreen extends StatelessWidget {
           actions: <Widget>[
             Container(
               child: IconButton(
+                icon: Icon(Icons.search),
+                onPressed: () {
+                  print('Searching');
+                },
+                splashColor: Colors.blue[900],
+              ),
+            ),
+            Container(
+              child: IconButton(
                 icon: Icon(Icons.file_upload),
-                iconSize: 30,
                 onPressed: () {
                   Navigator.of(context).push(MaterialPageRoute(
                       builder: (_) {
@@ -33,8 +41,18 @@ class HomeScreen extends StatelessWidget {
                         }
                       }
                   ));
+                },
+                splashColor: Colors.blue[900],
+              ),
+            ),
 
-                  print('hello');
+            Container(
+              color: Colors.black12,
+              child: IconButton(
+                icon: Icon(Icons.person),
+                iconSize: 30,
+                onPressed: () {
+                  Navigator.pushNamed(context, ProfileScreen.routeName);
                 },
                 splashColor: Colors.blue[900],
               ),

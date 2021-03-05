@@ -81,6 +81,12 @@ class FreeBooksApp extends StatelessWidget {
             child: RegisterScreen(),
           );
         },
+
+        'details': (context) => DetailsScreen(),
+
+        ChatScreen.routeName: (context) => ChatScreen(),
+
+        ProfileScreen.routeName: (context) => ProfileScreen()
       },
     );
   }
