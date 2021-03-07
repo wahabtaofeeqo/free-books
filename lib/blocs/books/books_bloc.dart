@@ -25,6 +25,8 @@ class BooksBloc extends Bloc<BooksEvent, BooksState> {
       yield* _load(event);
     else if(event is BookAddedEvent)
       yield* _bookAdded(event);
+    else if(event is SendMessageEvent)
+      _sendChat(event);
   }
 
   Stream<BooksState> _loadSuccess(BooksEvent event) async* {
@@ -76,6 +78,15 @@ class BooksBloc extends Bloc<BooksEvent, BooksState> {
     }
     else {
       return false;
+    }
+  }
+
+  _sendChat(SendMessageEvent event) {
+    try {
+      repository.sendChat(event.chat, event.node);
+    }
+    catch(err) {
+      print(err);
     }
   }
 }
