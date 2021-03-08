@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:free_books/models/models.dart';
 import 'package:free_books/utils/constants.dart';
 
@@ -15,7 +16,15 @@ class BooksRepository {
   }
   
   Future sendChat(Chat chat, String node) async {
-    await _firestore.collection(Constants.messages).doc(node).collection(Constants.chats).add(chat.toMap());
+    await _firestore.collection(Constants.messages)
+        .doc(node)
+        .collection(Constants.chats)
+        .doc(Timestamp.now().microsecondsSinceEpoch.toString()).set(chat.toMap());
+
     return Future.value(true);
+  }
+
+  Future<QuerySnapshot> loadChats(String node) async {
+    return await _firestore.collection(Constants.messages).doc(node).collection(Constants.chats).get();
   }
 }

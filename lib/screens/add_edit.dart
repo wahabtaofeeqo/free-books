@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -69,7 +70,7 @@ class _AddEditScreenState extends State<AddEditScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                            'Email'
+                            'Book Name'
                         ),
 
                         TextFormField(
@@ -157,6 +158,9 @@ class _AddEditScreenState extends State<AddEditScreen> {
                           else {
                             EasyLoading.show(status: 'Please wait...');
                             final Book book = Book(_name, _dept, _image);
+                            book.views = 0;
+                            book.userid = FirebaseAuth.instance.currentUser.uid;
+
                             await BlocProvider.of<BooksBloc>(context).addBook(book);
                             BlocProvider.of<BooksBloc>(context).add(BookAddedEvent(book));
                             EasyLoading.dismiss(animation: true);

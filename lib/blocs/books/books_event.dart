@@ -35,6 +35,15 @@ class BookAddedEvent extends BooksEvent {
 
 class BookUpdatedEvent extends BooksEvent {}
 
+class LoadChatEvent extends BooksEvent {
+  final String node;
+
+  const LoadChatEvent(this.node);
+
+  @override
+  List<Object> get props => [node];
+}
+
 class BookDeletedEvent extends BooksEvent {
   final Book book;
 

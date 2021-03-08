@@ -1,12 +1,15 @@
 import 'dart:collection';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:free_books/blocs/books/books_event.dart';
 import 'package:free_books/blocs/books/books_state.dart';
 import 'package:free_books/models/book.dart';
+import 'package:free_books/models/chat.dart';
 import 'package:free_books/repositories/books_repository.dart';
 
 class BooksBloc extends Bloc<BooksEvent, BooksState> {
@@ -27,6 +30,8 @@ class BooksBloc extends Bloc<BooksEvent, BooksState> {
       yield* _bookAdded(event);
     else if(event is SendMessageEvent)
       _sendChat(event);
+    else if(event is LoadChatEvent)
+      yield* _loadChats(event);
   }
 
   Stream<BooksState> _loadSuccess(BooksEvent event) async* {
@@ -77,11 +82,38 @@ class BooksBloc extends Bloc<BooksEvent, BooksState> {
       return reference != null;
     }
     else {
+
+      File file = File(book.logo);
+      var arr = book.logo.split("/");
+      print(arr.last);
+
+      //
+      // try {
+      //   Reference ref = FirebaseStorage.instance.ref().child('images/' + arr.last);
+      //   ref.putFile(file).snapshot.ref.getDownloadURL().then((value) => print(value));
+      // }
+      // catch(err) {
+      //   print(err);
+      // }
       return false;
     }
   }
 
+  Stream<BooksState> _loadChats(LoadChatEvent event) async* {
+    List<Chat> chats = new List();
+
+    print(event.node);
+
+    QuerySnapshot snapshot = await repository.loadChats(event.node);
+    snapshot.docs.forEach((element) {
+      chats.add(Chat.fromSnapshot(element));
+    });
+
+    yield ChatsLoadedState(chats);
+  }
+
   _sendChat(SendMessageEvent event) {
+    print(event.node);
     try {
       repository.sendChat(event.chat, event.node);
     }

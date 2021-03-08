@@ -18,18 +18,33 @@ class _ChatScreenState extends State<ChatScreen> {
 
   int type = 0; //Text
 
-  String chatNode = '';
-  bool _showSticker = false;
-
   Book book;
+
+  String chatNode = '';
+  bool chatsLoaded = false;
+  bool _showSticker = false;
 
   final controller = new TextEditingController();
 
+  String peerId = 'GTWEp5VyljU85eUvqKJ9brEJLD33'; //Temp
+
+  final userid = FirebaseAuth.instance.currentUser.uid;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
 
     this.book = ModalRoute.of(context).settings.arguments;
+    if(book.userid != null && book.userid.isNotEmpty)
+      this.peerId = book.userid;
+
+    //Load chat between the two users
+    BlocProvider.of<BooksBloc>(context)..add(LoadChatEvent(getNode(this.peerId)));
+
     return BlocBuilder<BooksBloc, BooksState>(
       builder: (context, state) {
         return Scaffold(
@@ -38,7 +53,7 @@ class _ChatScreenState extends State<ChatScreen> {
             child: Stack(
               children: [
 
-                _buildMessages(),
+                (state is ChatsLoadedState) ? _buildMessages((state as ChatsLoadedState).chats) : _buildLoader(),
 
                 (_showSticker) ? _buildSticker() : Container(),
 
@@ -70,51 +85,41 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  Widget _buildMessages() {
+  Widget _buildMessages(List<Chat> chats) {
+
     return Container(
       padding: EdgeInsets.all(10),
-      child: ListView(
-        children: [
-          Bubble(
-            stick: true,
-            color: Color.fromRGBO(212, 234, 244, 1.0),
-            child: Text('TODAY', textAlign: TextAlign.center, style: TextStyle(fontSize: 11.0)),
-          ),
-          Bubble(
-            margin: BubbleEdges.only(top: 10),
-            stick: true,
-            nip: BubbleNip.rightTop,
-            color: Color.fromRGBO(225, 255, 199, 1.0),
-            child: Text('Hello, World!', textAlign: TextAlign.right),
-          ),
-          Bubble(
-            margin: BubbleEdges.only(top: 10),
-            stick: true,
-            nip: BubbleNip.leftTop,
-            child: Text('Hi, developer!'),
-          ),
-          Bubble(
-            margin: BubbleEdges.only(top: 10),
-            stick: true,
-            nip: BubbleNip.rightBottom,
-            color: Color.fromRGBO(225, 255, 199, 1.0),
-            child: Text('Hello, World!', textAlign: TextAlign.right),
-          ),
-          Bubble(
-            margin: BubbleEdges.only(top: 10),
-            stick: true,
-            nip: BubbleNip.leftBottom,
-            child: Text('Hi, developer!'),
-          ),
-          Bubble(
-            margin: BubbleEdges.only(top: 10),
-            stick: true,
-            nip: BubbleNip.no,
-            color: Color.fromRGBO(212, 234, 244, 1.0),
-            child: Text('TOMORROW', textAlign: TextAlign.center, style: TextStyle(fontSize: 11.0)),
-          ),
-        ],
+      child: ListView.builder(
+        itemCount: chats.length,
+        itemBuilder: (context, int index) {
+          final chat = chats[index];
+          if(chat.to == this.userid) {
+            return _buildToBubble(chat);
+          }
+          else {
+            return _buildFromBubble(chat);
+          }
+        },
       ),
+    );
+  }
+
+  Widget _buildToBubble(Chat chat) {
+    return Bubble(
+      margin: BubbleEdges.only(top: 10, right: 35),
+      stick: true,
+      nip: BubbleNip.leftTop,
+      child: Text(chat.message, textAlign: TextAlign.left),
+    );
+  }
+
+  Widget _buildFromBubble(Chat chat) {
+    return Bubble(
+      margin: BubbleEdges.only(top: 10, left: 35),
+      stick: true,
+      nip: BubbleNip.rightTop,
+      color: Color.fromRGBO(225, 255, 199, 1.0),
+      child: Text(chat.message, textAlign: TextAlign.right),
     );
   }
 
@@ -169,37 +174,39 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  void _sendMessage() {
+  Widget _buildLoader() {
+    return Center(
+      child: CircularProgressIndicator(),
+    );
+  }
 
-    EasyLoading.show(status: 'Sending...');
-
-    if(controller.text.isNotEmpty) {
-      print(controller.text);
-    }
-
-    print(FirebaseAuth.instance.currentUser.uid.hashCode);
-    print(FirebaseAuth.instance.currentUser.uid);
+  String getNode(String peer) {
 
     String currentUserId = FirebaseAuth.instance.currentUser.uid;
-    String peerId = book.userid;
-
-    if (currentUserId.hashCode <= peerId.hashCode) {
-      chatNode = '$currentUserId-$peerId';
+    if (currentUserId.hashCode <= peer.hashCode) {
+      return '$currentUserId-$peer';
     } else {
-      chatNode = '$peerId-$currentUserId';
+      return '$peer-$currentUserId';
+    }
+  }
+
+  void _sendMessage() {
+    if(this.controller.text.trim().isNotEmpty) {
+      String currentUserId = FirebaseAuth.instance.currentUser.uid;
+
+      Chat chat = new Chat();
+      chat.from = currentUserId;
+      chat.to = this.peerId;
+      chat.message = controller.text;
+      chat.type = 0;
+
+      BlocProvider.of<BooksBloc>(context).add(SendMessageEvent(chat, getNode(peerId)));
+
+      controller.clear();
+      FocusScope.of(context).unfocus();
     }
 
-    Chat chat = new Chat();
-    chat.from = currentUserId;
-    chat.to = peerId;
-    chat.message = controller.text;
-    chat.type = 0;
-
-    BlocProvider.of<BooksBloc>(context).add(SendMessageEvent(chat, chatNode));
-
-    controller.clear();
-    FocusScope.of(context).unfocus();
-    EasyLoading.dismiss(animation: true);
+    print(getNode(peerId));
   }
 
   @override

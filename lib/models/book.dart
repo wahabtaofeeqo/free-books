@@ -5,7 +5,7 @@ class Book {
   final String name;
   final String department;
   String logo;
-  String userid = 'GTWEp5VyljU85eUvqKJ9brEJLD33'; //Temp
+  String userid;
   int views = 0;
 
   Book(this.name, this.department, [this.logo]);
