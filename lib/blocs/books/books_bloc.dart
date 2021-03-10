@@ -13,10 +13,10 @@ import 'package:free_books/models/chat.dart';
 import 'package:free_books/repositories/books_repository.dart';
 
 class BooksBloc extends Bloc<BooksEvent, BooksState> {
-  final BooksRepository repository;
-  String _defaultLogo = "assets/images/book.png";
 
-  List<Book> books;
+  final BooksRepository repository;
+  List<Book> _books;
+  List<Book> myBooks = [];
 
   BooksBloc({@required this.repository}) : super(BooksLoadingState());
 
@@ -35,7 +35,7 @@ class BooksBloc extends Bloc<BooksEvent, BooksState> {
   }
 
   Stream<BooksState> _loadSuccess(BooksEvent event) async* {
-    yield BooksLoadedState(this.books);
+    yield BooksLoadedState(this._books);
   }
 
   Stream<BooksState> _load(BooksEvent event) async* {
@@ -45,10 +45,15 @@ class BooksBloc extends Bloc<BooksEvent, BooksState> {
 
       QuerySnapshot snapshot = await repository.books;
       snapshot.docs.forEach((element) {
-        list.add(Book.fromSnapshot(element));
+        final Book book = Book.fromSnapshot(element);
+        if(element.data()['userid'] == FirebaseAuth.instance.currentUser.uid)
+          myBooks.add(book);
+        else
+          list.add(book);
       });
 
-      this.books = list;
+      print(myBooks.length);
+      this._books = list;
       add(BooksLoadSuccessEvent());
     }
     catch(err) {
@@ -70,39 +75,36 @@ class BooksBloc extends Bloc<BooksEvent, BooksState> {
 
   Future<bool> addBook(Book book) async {
 
-    if(book.logo == _defaultLogo) {
-      final Map<String, dynamic> data = Map();
-      data['name'] = book.name;
-      data['department'] = book.department;
-      data['logo'] = '';
-      data['user'] = FirebaseAuth.instance.currentUser.email;
+    book.userid = FirebaseAuth.instance.currentUser.uid;
 
-      DocumentReference reference = await FirebaseFirestore.instance.collection('books').add(data);
-      print(reference);
-      return reference != null;
+    File file = File(book.logo);
+    var arr = book.logo.split("/");
+    var image = "images/${arr.last}";
+
+    try {
+      Reference ref = FirebaseStorage.instance.ref().child(image);
+      await ref.putFile(file);
+
+      String url = await FirebaseStorage.instance.ref(image).getDownloadURL();
+      print(url);
+      book.logo = url;
+
+      return _saveBook(book);
     }
-    else {
-
-      File file = File(book.logo);
-      var arr = book.logo.split("/");
-      print(arr.last);
-
-      //
-      // try {
-      //   Reference ref = FirebaseStorage.instance.ref().child('images/' + arr.last);
-      //   ref.putFile(file).snapshot.ref.getDownloadURL().then((value) => print(value));
-      // }
-      // catch(err) {
-      //   print(err);
-      // }
-      return false;
+    catch(err) {
+      print(err);
     }
+
+    return false;
+  }
+
+  Future<bool> _saveBook(Book book) async {
+    await FirebaseFirestore.instance.collection('books').add(book.toMap());
+    return true;
   }
 
   Stream<BooksState> _loadChats(LoadChatEvent event) async* {
     List<Chat> chats = new List();
-
-    print(event.node);
 
     QuerySnapshot snapshot = await repository.loadChats(event.node);
     snapshot.docs.forEach((element) {
@@ -113,7 +115,6 @@ class BooksBloc extends Bloc<BooksEvent, BooksState> {
   }
 
   _sendChat(SendMessageEvent event) {
-    print(event.node);
     try {
       repository.sendChat(event.chat, event.node);
     }

@@ -13,10 +13,7 @@ class HomeScreen extends StatelessWidget {
       builder: (context, state) {
         return Scaffold(
           appBar: AppBar(title: const Text('Free Books'),
-          leading: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10.0),
-            child: Icon(Icons.book),
-          ),
+
           actions: <Widget>[
             Container(
               child: IconButton(

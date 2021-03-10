@@ -10,6 +10,7 @@ class Chat {
   String media;
 
   Chat();
+
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = HashMap();
     map['from'] = from;

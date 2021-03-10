@@ -21,14 +21,12 @@ class _ChatScreenState extends State<ChatScreen> {
   Book book;
 
   String chatNode = '';
-  bool chatsLoaded = false;
   bool _showSticker = false;
 
   final controller = new TextEditingController();
 
-  String peerId = 'GTWEp5VyljU85eUvqKJ9brEJLD33'; //Temp
-
-  final userid = FirebaseAuth.instance.currentUser.uid;
+  String peerId;
+  final userid = FirebaseAuth.instance.currentUser.uid; // Current User
 
   @override
   void initState() {
@@ -39,8 +37,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
 
     this.book = ModalRoute.of(context).settings.arguments;
-    if(book.userid != null && book.userid.isNotEmpty)
-      this.peerId = book.userid;
+    this.peerId = book.userid;
 
     //Load chat between the two users
     BlocProvider.of<BooksBloc>(context)..add(LoadChatEvent(getNode(this.peerId)));
@@ -53,7 +50,7 @@ class _ChatScreenState extends State<ChatScreen> {
             child: Stack(
               children: [
 
-                (state is ChatsLoadedState) ? _buildMessages((state as ChatsLoadedState).chats) : _buildLoader(),
+                (state is ChatsLoadedState) ? _buildMessages((state).chats) : _buildLoader(),
 
                 (_showSticker) ? _buildSticker() : Container(),
 
@@ -131,7 +128,7 @@ class _ChatScreenState extends State<ChatScreen> {
     return  Align(
       alignment: Alignment.bottomLeft,
       child: Container(
-        height: 60,
+        height: 50,
         color: Colors.black12,
         width: double.infinity,
         child: Row(

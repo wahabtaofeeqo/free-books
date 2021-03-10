@@ -93,7 +93,14 @@ class FreeBooksApp extends StatelessWidget {
           child: ChatScreen(),
         ),
 
-        ProfileScreen.routeName: (context) => ProfileScreen()
+        ProfileScreen.routeName: (context) => MultiBlocProvider(
+          providers: [
+            BlocProvider<BooksBloc>(
+              create: (context) => BlocProvider.of<BooksBloc>(context),
+            ),
+          ],
+          child: ProfileScreen(),
+        ),
       },
     );
   }

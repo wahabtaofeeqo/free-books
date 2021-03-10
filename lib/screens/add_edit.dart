@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -34,7 +35,6 @@ class _AddEditScreenState extends State<AddEditScreen> {
 
   @override
   void initState() {
-    this._image = "assets/images/book.png";
     super.initState();
   }
 
@@ -125,6 +125,7 @@ class _AddEditScreenState extends State<AddEditScreen> {
                     ),
                   ),
 
+
                   Container(
                     width: MediaQuery.of(context).size.width,
                     margin: EdgeInsets.all(16.0),
@@ -132,7 +133,7 @@ class _AddEditScreenState extends State<AddEditScreen> {
                     decoration: BoxDecoration(
                       image: DecorationImage(
                         fit: BoxFit.fill,
-                        image: AssetImage(_image),
+                        image: (_image == null ) ? Image.asset('assets/images/book.png').image : Image.file(File(_image)).image,
                       ),
                     ),
                     child: Center(
@@ -149,11 +150,15 @@ class _AddEditScreenState extends State<AddEditScreen> {
                     padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
                     child: RaisedButton(
                       onPressed: () async {
+
+                        //_test();
+
                         if(_formKey.currentState.validate()) {
                           _formKey.currentState.save();
 
                           if(_image == null) {
                             _scaffold.currentState.showSnackBar(SnackBar(content: Text('Please Select Book Logo')));
+                            return;
                           }
                           else {
                             EasyLoading.show(status: 'Please wait...');
@@ -185,7 +190,8 @@ class _AddEditScreenState extends State<AddEditScreen> {
   }
   _imgFromGallery() async {
     final image = await picker.getImage(source: ImageSource.gallery);
-    _image = image.path;
-    setState(() {});
+    setState(() {
+      _image = image.path;
+    });
   }
 }
